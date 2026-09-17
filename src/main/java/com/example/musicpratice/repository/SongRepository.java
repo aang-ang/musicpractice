@@ -2,9 +2,11 @@ package com.example.musicpratice.repository;
 
 import com.example.musicpratice.model.Song;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import javax.swing.tree.RowMapper;
+import java.util.List;
 
+@Repository
 public class SongRepository {
     private final JdbcTemplate jdbc;
 
@@ -21,7 +23,7 @@ public class SongRepository {
         song.setLevel(rs.getInt("level"));
         song.setCreatedDay(rs.getTimestamp("created_day").toLocalDateTime());
         return song;
-    }
+    };
 
     // 조회
     public List<Song> findAll() {
@@ -35,7 +37,7 @@ public class SongRepository {
 
     // 수정
     public void update(Song song) {
-        jdbc.update("update song set title=?, artist=?, instrument=?, where id=?", song.getTitle(), song.getArtist(), song.getInstrument(), song.getId());
+        jdbc.update("update song set title=?, artist=?, instrument=? where id=?", song.getTitle(), song.getArtist(), song.getInstrument(), song.getId());
     }
 
     // 삭제
