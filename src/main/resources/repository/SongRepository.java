@@ -1,3 +1,8 @@
+package com.example.musicpratice.repository;
+
+import com.example.musicpratice.model.Song;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import javax.swing.tree.RowMapper;
 
 public class SongRepository {
