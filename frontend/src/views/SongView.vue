@@ -243,6 +243,7 @@ onMounted(loadSongs)
   display: flex;
   gap: 8px;
 }
+.modal .btn { margin-bottom: 0; }
 
 .btn-cancel {
   background: none;
@@ -251,6 +252,10 @@ onMounted(loadSongs)
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  color: #444444;
+}
+.btn-cancel:hover {
+  background: #f5f5f5;
 }
 
 </style>
