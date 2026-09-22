@@ -1,11 +1,19 @@
 <script setup>
-import {ref,onMounted} from 'vue'
+import {ref,onMounted, computed} from 'vue'
 import {getSongs, addSong, updateSong, deleteSong} from '../api/song'
 
 const songs = ref([])
 const showForm = ref(false)
 const editTarget = ref(null)
 const form = ref({title: '', artist: '', instrument: ''})
+
+const searchText = ref('')
+const filterInstrument = ref("")
+
+const filteredSongs = computed(() => {
+  return songs.value.filter(s => s.title.includes(searchText.value) || s.artist.includes(searchText.value))
+      .filter(s => filterInstrument.value === '' || s.instrument === filterInstrument.value)
+})
 
 async function loadSongs() {
   const res = await getSongs()
@@ -49,6 +57,14 @@ onMounted(loadSongs)
 </script>
 
 <template>
+  <div class="toolbar">
+    <input v-model="searchText" placeholder="곡명 또는 아티스트 검색" class="search-input">
+    <select v-model="filterInstrument" class="filter-select">
+      <option value="">전체 악기</option>
+      <option v-for="inst in [...new Set(songs.map(s => s.instrument))]" :key="inst" :value="inst">{{inst}}</option>
+    </select>
+  </div>
+
   <div>
     <button class="btn" @click="openAdd">+ 곡 등록</button>
 
@@ -60,6 +76,7 @@ onMounted(loadSongs)
           <th>악기</th>
           <th>숙련도</th>
           <th>등록일</th>
+          <th>기능</th>
         </tr>
       </thead>
       <tbody>
@@ -67,7 +84,7 @@ onMounted(loadSongs)
           <td colspan="6" class="empty">등록된 곡이 없습니다.</td>
         </tr>
 
-        <tr v-for="song in songs" :key="song.id">
+        <tr v-for="song in filteredSongs" :key="song.id">
           <td>{{song.title}}</td>
           <td>{{song.artist}}</td>
           <td>{{song.instrument}}</td>
@@ -97,6 +114,31 @@ onMounted(loadSongs)
 </template>
 
 <style scoped>
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.search-input {
+  border: 1px solid #E5E5E5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 240px;
+  outline: none;
+}
+.search-input:focus {
+  border-color: #20A9E8;
+}
+.filter-select {
+  border: 1px solid #E5E5E5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  color: #444;
+}
+
 .btn {
   background: #20A9E8;
   color: white;
