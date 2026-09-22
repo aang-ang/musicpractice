@@ -44,4 +44,9 @@ public class SongRepository {
     public void delete(int id) {
         jdbc.update("delete from song where id=?", id);
     }
+
+    // 상세 정보
+    public Song findById(int id) {
+        return jdbc.queryForObject("select * from song where id=?", songMapper, id);
+    }
 }

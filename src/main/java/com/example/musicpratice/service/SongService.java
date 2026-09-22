@@ -28,4 +28,7 @@ public class SongService {
     public void deleteSong(int id) {
         songRepository.delete(id);
     }
+
+    // 상세정보
+    public Song getSongById(int id) { return songRepository.findById(id); }
 }

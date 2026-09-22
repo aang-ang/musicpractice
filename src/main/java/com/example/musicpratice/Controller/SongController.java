@@ -37,4 +37,10 @@ public class SongController {
     public void delete(@PathVariable int id) {
         songService.deleteSong(id);
     }
+
+    // 상세정보
+    @GetMapping("/{id}")
+    public Song getById(@PathVariable int id) {
+        return songService.getSongById(id);
+    }
 }
