@@ -14,3 +14,6 @@ export function updateSong(id, song) {
 export function deleteSong(id) {
     return axios.delete(`${base_url}/${id}`)
 }
+export function getSongById(id) {
+    return axios.get(`${base_url}/${id}`)
+}

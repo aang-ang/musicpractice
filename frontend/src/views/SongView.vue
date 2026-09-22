@@ -85,7 +85,7 @@ onMounted(loadSongs)
         </tr>
 
         <tr v-for="song in filteredSongs" :key="song.id">
-          <td>{{song.title}}</td>
+          <td><router-link :to="`/songs/${song.id}`" class="song-link">{{song.title}}</router-link> </td>
           <td>{{song.artist}}</td>
           <td>{{song.instrument}}</td>
           <td>{{ '★'.repeat(song.level) }}{{ '☆'.repeat(5 - song.level) }}</td>
@@ -196,6 +196,14 @@ onMounted(loadSongs)
   text-align: center;
   padding: 32px;
   color: #888888;
+}
+
+.song-link {
+  color: #20A9E8;
+  text-decoration: none;
+}
+.song-link:hover {
+  text-decoration: underline;
 }
 
 .modal-backdrop {
