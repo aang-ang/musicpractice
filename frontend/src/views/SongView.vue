@@ -25,6 +25,9 @@ function openEdit(song) {
 }
 
 async function submitForm() {
+  const msg = editTarget.value ? '수정하시겠습니까?' : '등록하시겠습니까?'
+  if (!confirm(msg)) return
+
   if (editTarget.value) {
     await updateSong(editTarget.value.id, form.value)
   } else {
