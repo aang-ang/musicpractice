@@ -6,7 +6,7 @@ import com.example.musicpratice.service.PR_Service;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/record")
+@RequestMapping("/api/records")
 @CrossOrigin(origins = "http://localhost:5173")
 public class PR_Controller {
     private final PR_Service prService;
