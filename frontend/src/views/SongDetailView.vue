@@ -2,6 +2,7 @@
 import {ref,onMounted} from 'vue'
 import {useRoute, useRouter} from "vue-router";
 import {getSongById} from '../api/song'
+import {deleteRecord, getRecordsBySongId} from "@/api/practice.js";
 
 const route = useRoute()
 const router = useRouter()
@@ -16,9 +17,32 @@ const levelDesc = {
   5: '5단계 - 완벽하게 완곡 가능'
 }
 
+const records = ref([])
+
+async function loadRecords() {
+  const res = await getRecordsBySongId(route.params.id)
+  records.value = res.data
+}
+
+
+async function removeRecord(id) {
+  if (!confirm('정말 삭제할까요?')) return
+  await deleteRecord(id)
+  loadRecords()
+}
+
+function formatDuration(start, end) {
+  const sec = Math.floor((new Date(end) - new Date(start)) / 1000)
+  const h = Math.floor(sec / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = sec % 60
+  return `${h}시간 ${m}분 ${s}초`
+}
+
 onMounted(async () => {
   const res = await getSongById(route.params.id)
   song.value = res.data
+  loadRecords()
 })
 </script>
 
@@ -50,6 +74,38 @@ onMounted(async () => {
     </div>
       <div class="level-desc">{{levelDesc[song.level]}}</div>
     </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <p class="section-label">연습 기록</p>
+      <table class="record-table">
+        <thead>
+          <tr>
+            <th>시작</th>
+            <th>종료</th>
+            <th>연습 시간</th>
+            <th>기능</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="records.length===0">
+            <td colspan="4" class="empty">연습 기록이 없습니다.</td>
+          </tr>
+
+          <tr v-for="record in records" :key="record.id">
+            <td>{{record.startTime?.slice(0, 16).replace('T', '')}}</td>
+            <td>{{record.endTime?.slice(0, 16).replace('T', '')}}</td>
+            <td>{{formatDuration(record.startTime, record.endTime)}}</td>
+            <td>
+              <button class="btn-sm btn-del" @click="removeRecord(record.id)">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
     <button class="btn-back" @click="router.back()">목록으로</button>
   </div>
 </template>
@@ -76,6 +132,65 @@ onMounted(async () => {
   flex-direction: column;
   gap: 18px;
 }
+.section-label {
+  font-size: 13px;
+  color: #888888;
+  margin-bottom: 12px;
+}
+.record-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.record-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #E5E5E5;
+  color: #888888;
+  font-weight: 600;
+}
+.record-table td {
+  padding: 12px;
+  border-bottom: 1px solid #E5E5E5;
+  color: #444444;
+}
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: #888888;
+}
+.btn-sm {
+  background: none;
+  border: 1px solid #E5E5E5;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 4px;
+}
+.btn-sm:hover {background: #f5f5f5}
+.btn-del {
+  color: #ff6b35;
+  border-color: #ff6b35;
+}
+.btn-del:hover {background: #fff3ef}
+
+.modal h3 {
+  font-size: 16px;
+  color: #444444;
+}
+.modal label {
+  font-size: 13px;
+  color: #888888;
+}
+.modal input {
+  padding: 8px 12px;
+  border: 1px solid #E5E5E5;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+.modal input:focus {border-color: #20a9e8}
 
 .label {
   width: 80px;

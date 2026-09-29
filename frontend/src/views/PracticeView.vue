@@ -28,13 +28,18 @@ function start() {
   timer = setInterval(() => {elapsed.value++}, 1000)
 }
 
+function toLocalISO(date) {
+  const offset = date.getTimezoneOffset() * 60000
+  return new Date(date - offset).toISOString().slice(0, 19)
+}
+
 async function stop() {
   isRunning.value = false
   clearInterval(timer)
   await addRecord({
     songId: selectedSong.value.id,
-    startTime: startTime.value.toISOString(),
-    endTime: new Date().toISOString()
+    startTime: toLocalISO(startTime.value),
+    endTime: toLocalISO(new Date())
   })
 }
 
