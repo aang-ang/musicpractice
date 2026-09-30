@@ -25,7 +25,7 @@ public class PR_Controller {
     // 곡별 기록 조회
     @GetMapping("/song/{songId}")
     public List<PracticeRecord> getBySongId(@PathVariable int songId) {
-        return prService.getRecordsBySongId(songId);
+        return prService.getSongRecord(songId);
     }
 
     // 삭제

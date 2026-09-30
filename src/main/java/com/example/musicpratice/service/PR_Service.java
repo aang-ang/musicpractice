@@ -17,7 +17,7 @@ public class PR_Service {
         prRepository.insert(record);
     }
 
-    public List<PracticeRecord> getRecordsBySongId(int songId) {
+    public List<PracticeRecord> getSongRecord(int songId) {
         return prRepository.findBySongId(songId);
     }
 

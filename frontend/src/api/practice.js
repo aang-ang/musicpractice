@@ -6,7 +6,7 @@ export function addRecord(record) {
     return axios.post(base_url, record)
 }
 
-export function getRecordsBySongId(songId) {
+export function getSongRecord(songId) {
     return axios.get(`${base_url}/song/${songId}`)
 }
 

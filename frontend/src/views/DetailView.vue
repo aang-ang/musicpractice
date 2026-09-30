@@ -2,7 +2,7 @@
 import {ref,onMounted} from 'vue'
 import {useRoute, useRouter} from "vue-router";
 import {getSongById} from '../api/song'
-import {deleteRecord, getRecordsBySongId} from "@/api/practice.js";
+import {deleteRecord, getSongRecord} from "@/api/practice.js";
 
 const route = useRoute()
 const router = useRouter()
@@ -20,7 +20,7 @@ const levelDesc = {
 const records = ref([])
 
 async function loadRecords() {
-  const res = await getRecordsBySongId(route.params.id)
+  const res = await getSongRecord(route.params.id)
   records.value = res.data
 }
 
