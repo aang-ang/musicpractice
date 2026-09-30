@@ -94,8 +94,8 @@ onMounted(async () => {
           </tr>
 
           <tr v-for="record in records" :key="record.id">
-            <td>{{record.startTime?.slice(0, 16).replace('T', '')}}</td>
-            <td>{{record.endTime?.slice(0, 16).replace('T', '')}}</td>
+            <td>{{record.startTime?.slice(0, 16).replace('T', ' ')}}</td>
+            <td>{{record.endTime?.slice(0, 16).replace('T', ' ')}}</td>
             <td>{{formatDuration(record.startTime, record.endTime)}}</td>
             <td>
               <button class="btn-sm btn-del" @click="removeRecord(record.id)">삭제</button>
@@ -116,11 +116,24 @@ onMounted(async () => {
   border: 1px solid #E5E5E5;
   border-radius: 8px;
   padding: 24px;
-  max-width: 480px;
+  max-width: 720px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
+.record-table th:nth-child(1),
+.record-table td:nth-child(1) { width: 160px; }
+
+.record-table th:nth-child(2),
+.record-table td:nth-child(2) { width: 160px; }
+
+.record-table th:nth-child(3),
+.record-table td:nth-child(3) { width: 160px; }
+
+.record-table th:nth-child(4),
+.record-table td:nth-child(4) { width: 80px; }
+
+
 .detail-row {
   display: flex;
   gap: 16px;
