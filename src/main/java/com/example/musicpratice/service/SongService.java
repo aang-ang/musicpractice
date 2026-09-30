@@ -31,4 +31,9 @@ public class SongService {
 
     // 상세정보
     public Song getSongById(int id) { return songRepository.findById(id); }
+
+    // 숙련도 업데이트
+    public void updateLevel(Song song) {
+        songRepository.updateLevel(song);
+    }
 }

@@ -43,4 +43,11 @@ public class SongController {
     public Song getById(@PathVariable int id) {
         return songService.getSongById(id);
     }
+
+    // 숙련도 업데이트
+    @PutMapping("/{id}/level")
+    public void updateLevel(@PathVariable int id, @RequestBody Song song) {
+        song.setId(id);
+        songService.updateLevel(song);
+    }
 }

@@ -49,4 +49,9 @@ public class SongRepository {
     public Song findById(int id) {
         return jdbc.queryForObject("select * from song where id=?", songMapper, id);
     }
+
+    // 숙련도 업데이트
+    public void updateLevel(Song song) {
+        jdbc.update("update song set level=? where id=?", song.getLevel(), song.getId());
+    }
 }

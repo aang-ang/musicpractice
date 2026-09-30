@@ -2,6 +2,7 @@
 import {ref, onMounted} from 'vue'
 import {getSongs} from '../api/song'
 import {addRecord} from "@/api/practice";
+import {updateLevel} from "../api/song";
 
 const startTime = ref(null)
 
@@ -10,6 +11,17 @@ const selectedSong = ref(null)
 const isRunning = ref(false)
 const elapsed = ref(0)
 let timer = null
+
+const showPopup = ref(false)
+const selectedLevel = ref(0)
+const levelDesc = {
+  0: '숙련도가 없습니다.',
+  1: '1단계 - 입문',
+  2: '2단계 - 초반 연주 가능',
+  3: '3단계 - 중반 연주 가능',
+  4: '4단계 - 완곡 가능(자잘한 실수)',
+  5: '5단계 - 완벽하게 완곡 가능'
+}
 
 onMounted(async () => {
   const res = await getSongs()
@@ -41,6 +53,12 @@ async function stop() {
     startTime: toLocalISO(startTime.value),
     endTime: toLocalISO(new Date())
   })
+  showPopup.value = true // 팝업 열기
+}
+async function submitLevel() {
+  await updateLevel(selectedSong.value.id, selectedLevel.value)
+  showPopup.value = false
+  selectedLevel.value = 0
 }
 
 function formatTime(sec) {
@@ -49,6 +67,8 @@ function formatTime(sec) {
   const s = String(sec % 60).padStart(2, '0')
   return `${h}:${m}:${s}`
 }
+
+
 </script>
 
 <template>
@@ -67,6 +87,21 @@ function formatTime(sec) {
       <div class="timer-buttons">
         <button class="btn" :disabled="!selectedSong || isRunning" @click="start">시작</button>
         <button class="btn btn-stop" :disabled="!isRunning" @click="stop">종료</button>
+      </div>
+    </div>
+
+    <div v-if="showPopup" class="modal-backdrop">
+      <div class="modal">
+        <h3>연습 완료</h3>
+        <p class="modal-sub">현재 숙련도를 선택해주세요.</p>
+        <div class="stars">
+          <span v-for="n in 5" :key="n" class="star" :class="{filled: n <= selectedLevel}" @click="selectedLevel = n">★</span>
+        </div>
+        <p class="level-desc">{{levelDesc[selectedLevel]}}</p>
+        <div class="modal-buttons">
+          <button class="btn" @click="submitLevel()">확인</button>
+          <button class="btn-cancel" @click="showPopup = false">건너뛰기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -112,7 +147,6 @@ function formatTime(sec) {
   font-size: 12px;
   color: #888888;
 }
-
 
 .timer-area {
   flex: 1;
@@ -169,5 +203,69 @@ function formatTime(sec) {
 .btn-stop:hover:not(:disabled) {
   background: #ff6b35;
   color: white;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 320px;
+}
+.modal h3 {
+  font-size: 18px;
+  color: #444444;
+}
+.modal-sub {
+  font-size: 13px;
+  color: #888888;
+}
+.stars {
+  display: flex;
+  gap: 8px;
+}
+.star {
+  font-size: 36px;
+  color: #e5e5e5;
+  cursor: pointer;
+}
+.star.filled {
+  color: #20a9e8;
+}
+.level-desc {
+  font-size: 13px;
+  color: #888888;
+}
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.btn:hover {
+  background: #20a9e8;
+  color: white;
+}
+.btn-cancel {
+  background: none;
+  border: 1px solid #e5e5e5;
+  padding: 10px 32px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444444;
+}
+.btn-cancel:hover {
+  background: #f5f5f5;
 }
 </style>
