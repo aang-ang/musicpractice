@@ -3,6 +3,55 @@ import {ref,onMounted} from 'vue'
 import {useRoute, useRouter} from "vue-router";
 import {getSongById} from '../api/song'
 import {deleteRecord, getSongRecord} from "@/api/practice.js";
+import {getGoalsSongId, addGoal, updateGoal, deleteGoal} from "../api/goal";
+
+const goals = ref([])
+const showGoalForm = ref(false)
+const editGoal = ref(null)
+const goalForm = ref({startDate: "", endDate:"", goalDetail:"", goalMinutes: "", changeDetail: ""})
+
+async function loadGoals() {
+  const res = await getGoalsSongId(route.params.id)
+  goals.value = res.data
+}
+
+function openAddGoal() {
+  editGoal.value = null
+  goalForm.value = {startDate: "", endDate:"", goalDetail:"", goalMinutes: "", changeDetail: ""}
+  showGoalForm.value = true
+}
+
+function openEditGoal(goal) {
+  editGoal.value = goal
+  goalForm.value = {
+    startDate: goal.startDate,
+    endDate: goal.endDate,
+    goalDetail: goal.goalDetail,
+    goalMinutes: goal.goalMinutes,
+    changeDetail: goal.changeDetail
+  }
+  showGoalForm.value = true
+}
+
+async function submitGoal() {
+  const msg = editGoal.value ? '수정하시겠습니까?' : '등록하시겠습니까?'
+  if (!confirm(msg)) return
+
+  const data = {...goalForm.value, songId: route.params.id}
+  if (editGoal.value) {
+    await updateGoal(editGoal.value.id, data)
+  } else {
+    await addGoal(data)
+  }
+  showGoalForm.value = false
+  loadGoals()
+}
+
+async function removeGoal(id) {
+  if (!confirm('삭제하시겠습니까?')) return
+  await deleteGoal(id)
+  loadGoals()
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -43,6 +92,7 @@ onMounted(async () => {
   const res = await getSongById(route.params.id)
   song.value = res.data
   loadRecords()
+  loadGoals()
 })
 </script>
 
@@ -105,8 +155,57 @@ onMounted(async () => {
       </table>
     </div>
 
-
     <button class="btn-back" @click="router.back()">목록으로</button>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <p class="section-label">연습 목표</p>
+        <button class="btn-add" @click="openAddGoal">+ 목표 등록</button>
+      </div>
+      <table class="record-table">
+        <thead>
+          <tr>
+            <th>기간</th>
+            <th>목표 내용</th>
+            <th>목표 시간</th>
+            <th>상태</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="goals.length===0">
+            <td colspan="5" class="empty">등록된 목표가 없습니다.</td>
+          </tr>
+          <tr v-for="goal in goals" :key="goal.id">
+            <td>{{goal.startDate}} ~ {{goal.endDate}}</td>
+            <td>{{goal.goalDetail}}</td>
+            <td>{{goal.goalMinutes}}</td>
+            <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
+            <td>
+              <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
+              <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="showGoalForm" class="modal-backdrop">
+      <div class="modal">
+        <h3>{{editGoal ? '목표 수정' : '목표 등록'}}</h3>
+        <input v-model="goalForm.startDate" type="date" placeholder="시작일">
+        <input v-model="goalForm.endDate" type="date" placeholder="종료일">
+        <input v-model="goalForm.goalDetail" placeholder="목표 내용">
+        <input v-model="goalForm.goalMinutes" type="number" placeholder="목표 연습 시간(분)">
+        <input v-model="goalForm.changeDetail" placeholder="개선할 내용 (선택)">
+        <div class="modal-buttons">
+          <button class="btn" @click="submitGoal">저장</button>
+          <button class="btn-cancel" @click="showGoalForm = false">취소</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -245,5 +344,68 @@ onMounted(async () => {
   border-top: 1px solid #E5E5E5;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.btn-add {
+  background: #20a9e8;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.btn-add:hover {background: #1890c8;}
+
+.status-진행전 {color: #888888;}
+.status-진행중 {color: #20a9e8;}
+.status-완료 {color: #52c41a;}
+.status-미완료 {color: #ff6b35;}
+
+.modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 360px;
+}
+.modal h3 {font-size: 16px;color: #444444;}
+.modal input {
+  border: 1px solid #E5E5E5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+.modal input:focus {border-color: #20a9e8;}
+.modal-buttons {display: flex; gap: 8px;}
+.btn {
+  background: #20a9e8;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn:hover {background: #1890c8;}
+.btn-cancel {
+  background: none;
+  border: 1px solid #E5E5E5;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444444;
+}
+.btn-cancel:hover {
+  background: #f5f5f5;
+}
 
 </style>
