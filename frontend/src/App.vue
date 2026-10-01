@@ -79,6 +79,7 @@
   .content {
     flex: 1;
     padding: 32px 40px;
+    overflow-y: auto;
   }
   .page-title {
     font-size: 22px;
