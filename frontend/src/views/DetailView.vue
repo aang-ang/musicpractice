@@ -11,6 +11,8 @@ const goals = ref([])
 const showGoalForm = ref(false)
 const editGoal = ref(null)
 const goalForm = ref({startDate: "", endDate:"", goalDetail:"", goalMinutes: "", changeDetail: ""})
+const goalHours = ref(0)
+const goalMins = ref(0)
 
 async function loadGoals() {
   const res = await getGoalsSongId(route.params.id)
@@ -20,6 +22,8 @@ async function loadGoals() {
 function openAddGoal() {
   editGoal.value = null
   goalForm.value = {startDate: "", endDate:"", goalDetail:"", goalMinutes: "", changeDetail: ""}
+  goalHours.value = 0
+  goalMins.value = 0
   showGoalForm.value = true
 }
 
@@ -32,10 +36,13 @@ function openEditGoal(goal) {
     goalMinutes: goal.goalMinutes,
     changeDetail: goal.changeDetail
   }
+  goalHours.value = Math.floor(goal.goalMinutes / 60)
+  goalMins.value = goal.goalMinutes % 60
   showGoalForm.value = true
 }
 
 async function submitGoal() {
+  goalForm.value.goalMinutes = goalHours.value * 60 + goalMins.value
   const msg = editGoal.value ? '수정하시겠습니까?' : '등록하시겠습니까?'
   if (!confirm(msg)) return
 
@@ -88,6 +95,14 @@ function formatDuration(start, end) {
   const m = Math.floor((sec % 3600) / 60)
   const s = sec % 60
   return `${h}시간 ${m}분 ${s}초`
+}
+
+function formatMinutes(minutes) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h===0) return `${m}분`
+  if (m===0) return `${h}시간`
+  return `${h}시간 ${m}분`
 }
 
 // flatpickr (달력)
@@ -167,10 +182,6 @@ onMounted(async () => {
       </table>
     </div>
 
-    <button class="btn-back" @click="router.back()">목록으로</button>
-
-    <div class="divider"></div>
-
     <div class="section">
       <div class="section-header">
         <p class="section-label">연습 목표</p>
@@ -193,7 +204,7 @@ onMounted(async () => {
           <tr v-for="goal in goals" :key="goal.id">
             <td>{{goal.startDate}} ~ {{goal.endDate}}</td>
             <td>{{goal.goalDetail}}</td>
-            <td>{{goal.goalMinutes}}</td>
+            <td>{{formatMinutes(goal.goalMinutes)}}</td>
             <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
             <td>
               <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
@@ -210,7 +221,10 @@ onMounted(async () => {
         <input type="text" id="start-date" v-model="goalForm.startDate" placeholder="시작일">
         <input type="text" id="end-date" v-model="goalForm.endDate" placeholder="종료일">
         <input v-model="goalForm.goalDetail" placeholder="목표 내용">
-        <input v-model="goalForm.goalMinutes" type="number" placeholder="목표 연습 시간(분)">
+        <div class="time-input">
+          <input type="number" v-model="goalHours" min="0" placeholder="0">시간
+          <input type="number" v-model="goalMins" min="0" max="59" placeholder="0">분
+        </div>
         <input v-model="goalForm.changeDetail" placeholder="개선할 내용 (선택)">
         <div class="modal-buttons">
           <button class="btn" @click="submitGoal">저장</button>
@@ -218,6 +232,10 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <button class="btn-back" @click="router.back()">목록으로</button>
+
+
   </div>
 </template>
 
@@ -433,4 +451,14 @@ onMounted(async () => {
   background: #f5f5f5;
 }
 
+.time-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444444;
+}
+.time-input input {
+  width: 60px;
+}
 </style>
