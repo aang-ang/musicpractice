@@ -14,3 +14,6 @@ export function updateGoal(id, goal) {
 export function deleteGoal(id) {
     return axios.delete(`${base_url}/${id}`);
 }
+export function getAchieve(goalId) {
+    return axios.get(`${base_url}/${goalId}/achieve`);
+}

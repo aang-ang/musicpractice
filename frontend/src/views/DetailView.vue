@@ -5,7 +5,7 @@ import {ref,onMounted, watch} from 'vue'
 import {useRoute, useRouter} from "vue-router";
 import {getSongById} from '../api/song'
 import {deleteRecord, getSongRecord} from "@/api/practice.js";
-import {getGoalsSongId, addGoal, updateGoal, deleteGoal} from "../api/goal";
+import {getGoalsSongId, addGoal, updateGoal, deleteGoal, getAchieve} from "../api/goal";
 
 const goals = ref([])
 const showGoalForm = ref(false)
@@ -16,7 +16,12 @@ const goalMins = ref(0)
 
 async function loadGoals() {
   const res = await getGoalsSongId(route.params.id)
-  goals.value = res.data
+  const list = res.data
+  for (const goal of list) {
+    const r = await getAchieve(goal.id)
+    goal.achieve = Math.min(Math.round(r.data/goal.goalMinutes * 100), 100)   // 달성률 100% 넘지 않도록
+  }
+  goals.value = list
 }
 
 function openAddGoal() {
@@ -208,6 +213,7 @@ onMounted(async () => {
               <th>목표 시간</th>
               <th>상태</th>
               <th>개선사항</th>
+              <th>달성률</th>
               <th>기능</th>
             </tr>
           </thead>
@@ -221,6 +227,7 @@ onMounted(async () => {
               <td>{{formatMinutes(goal.goalMinutes)}}</td>
               <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
               <td class="ellipsis" :title="goal.changeDetail">{{goal.changeDetail || '-'}}</td>
+              <td>{{goal.achieve}}%</td>
               <td>
                 <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
                 <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
@@ -261,7 +268,7 @@ onMounted(async () => {
   border: 1px solid #E5E5E5;
   border-radius: 8px;
   padding: 24px;
-  max-width: 1000px;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   gap: 16px;
