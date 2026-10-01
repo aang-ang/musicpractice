@@ -42,7 +42,17 @@ function openEditGoal(goal) {
 }
 
 async function submitGoal() {
-  goalForm.value.goalMinutes = goalHours.value * 60 + goalMins.value
+  goalForm.value.goalMinutes = Number(goalHours.value) * 60 + Number(goalMins.value)
+
+  if (goalForm.value.goalMinutes <= 0) {
+    alert("목표 시간을 입력해주세요.")
+    return
+  }
+  if (goalForm.value.startDate > goalForm.value.endDate) {
+    alert("종료일이 시작일보다 빠를 수 없습니다.")
+    return
+  }
+
   const msg = editGoal.value ? '수정하시겠습니까?' : '등록하시겠습니까?'
   if (!confirm(msg)) return
 
@@ -156,30 +166,32 @@ onMounted(async () => {
 
     <div class="section">
       <p class="section-label">연습 기록</p>
-      <table class="record-table">
-        <thead>
-          <tr>
-            <th>시작</th>
-            <th>종료</th>
-            <th>연습 시간</th>
-            <th>기능</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="records.length===0">
-            <td colspan="4" class="empty">연습 기록이 없습니다.</td>
-          </tr>
+      <div class="table-scroll">
+        <table class="record-table">
+          <thead>
+            <tr>
+              <th>시작</th>
+              <th>종료</th>
+              <th>연습 시간</th>
+              <th>기능</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="records.length===0">
+              <td colspan="4" class="empty">연습 기록이 없습니다.</td>
+            </tr>
 
-          <tr v-for="record in records" :key="record.id">
-            <td>{{record.startTime?.slice(0, 16).replace('T', ' ')}}</td>
-            <td>{{record.endTime?.slice(0, 16).replace('T', ' ')}}</td>
-            <td>{{formatDuration(record.startTime, record.endTime)}}</td>
-            <td>
-              <button class="btn-sm btn-del" @click="removeRecord(record.id)">삭제</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            <tr v-for="record in records" :key="record.id">
+              <td>{{record.startTime?.slice(0, 16).replace('T', ' ')}}</td>
+              <td>{{record.endTime?.slice(0, 16).replace('T', ' ')}}</td>
+              <td>{{formatDuration(record.startTime, record.endTime)}}</td>
+              <td>
+                <button class="btn-sm btn-del" @click="removeRecord(record.id)">삭제</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="section">
@@ -187,32 +199,34 @@ onMounted(async () => {
         <p class="section-label">연습 목표</p>
         <button class="btn-add" @click="openAddGoal">+ 목표 등록</button>
       </div>
-      <table class="record-table">
-        <thead>
-          <tr>
-            <th>기간</th>
-            <th>목표 내용</th>
-            <th>목표 시간</th>
-            <th>상태</th>
-            <th>기능</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="goals.length===0">
-            <td colspan="5" class="empty">등록된 목표가 없습니다.</td>
-          </tr>
-          <tr v-for="goal in goals" :key="goal.id">
-            <td>{{goal.startDate}} ~ {{goal.endDate}}</td>
-            <td>{{goal.goalDetail}}</td>
-            <td>{{formatMinutes(goal.goalMinutes)}}</td>
-            <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
-            <td>
-              <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
-              <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-scroll">
+        <table class="record-table">
+          <thead>
+            <tr>
+              <th>기간</th>
+              <th>목표 내용</th>
+              <th>목표 시간</th>
+              <th>상태</th>
+              <th>기능</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="goals.length===0">
+              <td colspan="5" class="empty">등록된 목표가 없습니다.</td>
+            </tr>
+            <tr v-for="goal in goals" :key="goal.id">
+              <td>{{goal.startDate}} ~ {{goal.endDate}}</td>
+              <td>{{goal.goalDetail}}</td>
+              <td>{{formatMinutes(goal.goalMinutes)}}</td>
+              <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
+              <td>
+                <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
+                <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div v-if="showGoalForm" class="modal-backdrop">
@@ -460,5 +474,10 @@ onMounted(async () => {
 }
 .time-input input {
   width: 60px;
+}
+
+.table-scroll {
+  max-height: 200px;
+  overflow-y: auto;
 }
 </style>
