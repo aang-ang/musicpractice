@@ -208,6 +208,7 @@ onMounted(async () => {
               <th>목표 시간</th>
               <th>상태</th>
               <th>기능</th>
+              <th>개선사항</th>
             </tr>
           </thead>
           <tbody>
@@ -223,6 +224,7 @@ onMounted(async () => {
                 <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
                 <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
               </td>
+              <td>{{goal.changeDetail || '-'}}</td>
             </tr>
           </tbody>
         </table>
@@ -259,7 +261,7 @@ onMounted(async () => {
   border: 1px solid #E5E5E5;
   border-radius: 8px;
   padding: 24px;
-  max-width: 900px;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   gap: 16px;
