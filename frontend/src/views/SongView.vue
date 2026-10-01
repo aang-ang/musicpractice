@@ -140,18 +140,15 @@ onMounted(loadSongs)
 }
 
 .btn {
-  background: #20A9E8;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  background: none;
+  color: #20a9e8;
+  border: 1px solid #20a9e8;
+  padding: 5px 12px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 13px;
 }
-.btn:hover {
-  background: #1890c8;
-}
+.btn:hover {background: #f0f9ff;}
 
 .btn-sm {
   background: none;
