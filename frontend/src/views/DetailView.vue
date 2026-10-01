@@ -207,8 +207,8 @@ onMounted(async () => {
               <th>목표 내용</th>
               <th>목표 시간</th>
               <th>상태</th>
-              <th>기능</th>
               <th>개선사항</th>
+              <th>기능</th>
             </tr>
           </thead>
           <tbody>
@@ -217,14 +217,14 @@ onMounted(async () => {
             </tr>
             <tr v-for="goal in goals" :key="goal.id">
               <td>{{goal.startDate}} ~ {{goal.endDate}}</td>
-              <td>{{goal.goalDetail}}</td>
+              <td class="ellipsis" :title="goal.goalDetail">{{goal.goalDetail}}</td>
               <td>{{formatMinutes(goal.goalMinutes)}}</td>
               <td><span :class="'status-' + goal.status">{{goal.status}}</span></td>
+              <td class="ellipsis" :title="goal.changeDetail">{{goal.changeDetail || '-'}}</td>
               <td>
                 <button class="btn-sm" @click="openEditGoal(goal)">수정</button>
                 <button class="btn-sm btn-del" @click="removeGoal(goal.id)">삭제</button>
               </td>
-              <td>{{goal.changeDetail || '-'}}</td>
             </tr>
           </tbody>
         </table>
@@ -481,5 +481,12 @@ onMounted(async () => {
 .table-scroll {
   max-height: 200px;
   overflow-y: auto;
+}
+
+.ellipsis {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
