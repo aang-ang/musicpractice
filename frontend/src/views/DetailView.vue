@@ -1,5 +1,7 @@
 <script setup>
-import {ref,onMounted} from 'vue'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
+import {ref,onMounted, watch} from 'vue'
 import {useRoute, useRouter} from "vue-router";
 import {getSongById} from '../api/song'
 import {deleteRecord, getSongRecord} from "@/api/practice.js";
@@ -88,6 +90,16 @@ function formatDuration(start, end) {
   return `${h}시간 ${m}분 ${s}초`
 }
 
+// flatpickr (달력)
+watch(showGoalForm, (val) => {
+  if (val) {
+    setTimeout(() => {
+      flatpickr("#start-date", {dateFormat: 'Y-m-d'})
+      flatpickr("#end-date", {dateFormat: 'Y-m-d'})
+    },50)
+  }
+})
+
 onMounted(async () => {
   const res = await getSongById(route.params.id)
   song.value = res.data
@@ -171,7 +183,7 @@ onMounted(async () => {
             <th>목표 내용</th>
             <th>목표 시간</th>
             <th>상태</th>
-            <th></th>
+            <th>기능</th>
           </tr>
         </thead>
         <tbody>
@@ -195,8 +207,8 @@ onMounted(async () => {
     <div v-if="showGoalForm" class="modal-backdrop">
       <div class="modal">
         <h3>{{editGoal ? '목표 수정' : '목표 등록'}}</h3>
-        <input v-model="goalForm.startDate" type="date" placeholder="시작일">
-        <input v-model="goalForm.endDate" type="date" placeholder="종료일">
+        <input type="text" id="start-date" v-model="goalForm.startDate" placeholder="시작일">
+        <input type="text" id="end-date" v-model="goalForm.endDate" placeholder="종료일">
         <input v-model="goalForm.goalDetail" placeholder="목표 내용">
         <input v-model="goalForm.goalMinutes" type="number" placeholder="목표 연습 시간(분)">
         <input v-model="goalForm.changeDetail" placeholder="개선할 내용 (선택)">
@@ -215,13 +227,13 @@ onMounted(async () => {
   border: 1px solid #E5E5E5;
   border-radius: 8px;
   padding: 24px;
-  max-width: 720px;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 .record-table th:nth-child(1),
-.record-table td:nth-child(1) { width: 160px; }
+.record-table td:nth-child(1) { width: 200px; }
 
 .record-table th:nth-child(2),
 .record-table td:nth-child(2) { width: 160px; }
@@ -230,7 +242,7 @@ onMounted(async () => {
 .record-table td:nth-child(3) { width: 160px; }
 
 .record-table th:nth-child(4),
-.record-table td:nth-child(4) { width: 80px; }
+.record-table td:nth-child(4) { width: 70px; }
 
 
 .detail-row {
@@ -351,20 +363,33 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 .btn-add {
-  background: #20a9e8;
-  color: white;
-  border: none;
-  padding: 6px 14px;
+  background: none;
+  color: #20a9e8;
+  border: 1px solid #20a9e8;
+  padding: 5px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
 }
-.btn-add:hover {background: #1890c8;}
+.btn-add:hover {background: #f0f9ff;}
 
 .status-진행전 {color: #888888;}
 .status-진행중 {color: #20a9e8;}
 .status-완료 {color: #52c41a;}
 .status-미완료 {color: #ff6b35;}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
 
 .modal {
   background: white;
