@@ -2,6 +2,7 @@ package com.example.musicpratice.Controller;
 
 import com.example.musicpratice.model.PracticeGoal;
 import com.example.musicpratice.service.GoalService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,5 +36,11 @@ public class GoalController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
         goalService.deleteGoal(id);
+    }
+
+    // 달성률
+    @GetMapping("/{id}/achieve")
+    public ResponseEntity<Integer> getAchieve(@PathVariable int id) {
+        return ResponseEntity.ok(goalService.getAchieve(id));
     }
 }

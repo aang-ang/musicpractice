@@ -33,4 +33,9 @@ public class GoalService {
     public void deleteGoal(int id) {
         goalRepository.delete(id);
     }
+
+    // 달성률
+    public int getAchieve(int goalId) {
+        return goalRepository.getAchieve(goalId);
+    }
 }

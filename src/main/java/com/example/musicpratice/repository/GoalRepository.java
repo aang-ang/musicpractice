@@ -53,4 +53,12 @@ public class GoalRepository {
     public void delete(int id) {
         jdbc.update("delete from practice_goal where id=?", id);
     }
+
+    // 달성률 계산
+    public int getAchieve(int goalId) {
+        String sql = "select coalesce(sum(timestampdiff(minute, start_time, end_time)), 0)" + "from practice_record"
+                + "where song_id = (select song_id from practice_goal where id = ?)" + "and date(start_time) between (select start_date from practice_goal where id=?)"
+                + "and (select end_date from practice_goal where id=?)";
+        return jdbc.queryForObject(sql, Integer.class, goalId, goalId, goalId);
+    }
 }
